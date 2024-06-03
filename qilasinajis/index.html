@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6e6;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .container {
+            display: none;
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #login-section {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+        .moving-button {
+            position: relative;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button#yes {
+            background-color: #ff66b2;
+            color: white;
+        }
+        button#no {
+            background-color: #ff4d4d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-section">
+        <h1>Hii princess qila</h1>
+        <form onsubmit="return validateLogin()">
+            <label for="login">Login ID:</label>
+            <input type="text" id="login" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" required><br><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="main-section" class="container">
+        <h2>Will you be my babu?</h2>
+        <button id="yes" onclick="showYesMessage()">Yes</button>
+        <button id="no" class="moving-button" onmouseover="moveNoButton()">No</button>
+    </div>
+
+    <script>
+        function validateLogin() {
+            var login = document.getElementById('login').value;
+            var password = document.getElementById('password').value;
+
+            if (login === 'qila' && password === 'qilabocil') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('main-section').style.display = 'block';
+                return false; // Prevent form submission
+            } else {
+                alert('Incorrect Login or Password');
+                return false; // Prevent form submission
+            }
+        }
+
+        function showYesMessage() {
+            alert('ok');
+        }
+
+        function moveNoButton() {
+            var button = document.getElementById('no');
+            var container = document.getElementById('main-section');
+            var containerRect = container.getBoundingClientRect();
+            var buttonRect = button.getBoundingClientRect();
+
+            var newTop = Math.random() * (containerRect.height - buttonRect.height);
+            var newLeft = Math.random() * (containerRect.width - buttonRect.width);
+
+            button.style.top = newTop + 'px';
+            button.style.left = newLeft + 'px';
+        }
+    </script>
+</body>
+</html>
