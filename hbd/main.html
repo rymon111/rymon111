@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday Aliya</title>
+  <meta name="description" content="Website ucapan ulang tahun interaktif gaya slide-to-slide dengan overview.">
+  <style>
+    :root {
+  --bg1: #ffe6f0; 
+  --bg2: #fff0f7;
+  --text: #5a3a57;
+  --muted: #a87ca0;
+  --accent: #ff99cc;
+  --accent2: #ffb6f9;
+  --accent3: #ffd6e7;
+  --card: #ffffff;
+  --dot: #ffb6c1;
+  --dot-active: #ff69b4;
+  --bar: #ff99cc;
+  font-family: 'Comic Neue', cursive;
+}
+
+/* Hearts floating */
+.heart {
+  position: fixed;
+  font-size: 24px;
+  color: #ff69b4;
+  animation: floatUp 6s linear infinite;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+}
+
+    [data-theme="light"]{
+      --bg1:#fff7f9; --bg2:#ffe7f0; --text:#2a2a2a; --muted:#6b7280;
+      --accent:#ff3388; --accent2:#00aaff; --accent3:#ffd166; --card:#ffffff;
+      --dot:#a3baff; --dot-active:#222; --bar:#ff6fa0;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text)}
+    body{overflow:hidden}
+    a{color:inherit;text-decoration:none}
+
+    /* Top progress bar */
+    .progress{position:fixed;top:0;left:0;width:100%;height:4px;background:rgba(255,255,255,.12);z-index:1000}
+    .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--bar),var(--accent2))}
+
+    /* Header controls */
+    header{position:fixed;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;z-index:1001}
+    .controls{display:flex;gap:8px}
+    .btn{appearance:none;border:none;padding:8px 12px;border-radius:12px;cursor:pointer;font-weight:600;color:#fff;background:linear-gradient(180deg,var(--accent),#ff7fb0);box-shadow:0 6px 12px rgba(0,0,0,.25)}
+    .btn.alt{background:linear-gradient(180deg,var(--accent2),#6beaff);color:#002d36}
+    .btn.secondary{background:linear-gradient(180deg,#7c89ff,#a6b3ff)}
+    .brand{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:6px 10px}
+    .brand img{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);object-fit:cover}
+
+    /* Slides container */
+    .deck{position:fixed;inset:0;display:flex;transition:transform .6s cubic-bezier(.22,.61,.36,1);will-change:transform}
+    .slide{min-width:100vw;min-height:100vh;padding:84px 28px 64px;display:grid;place-items:center;position:relative}
+    .content{width:min(960px,90vw);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:translateY(10px) scale(.98);opacity:0;transition:opacity .5s ease, transform .5s ease}
+    .slide.active .content{opacity:1;transform:translateY(0) scale(1)}
+    h1{margin:0 0 10px;font-size:clamp(28px,5vw,48px)}
+    h2{margin:0 0 8px;font-size:clamp(22px,4vw,34px)}
+    p{color:var(--muted);margin:0 0 10px}
+
+    /* Bottom dots + arrows */
+    .nav-bottom{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:1001}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--dot);opacity:.6;cursor:pointer}
+    .dot.active{background:var(--dot-active);opacity:1;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+    .arrows{display:flex;gap:8px}
+
+    /* Overview grid */
+    .overview{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);display:none;z-index:1002;padding:60px 20px;overflow:auto}
+    .overview.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+    .thumb{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:10px;cursor:pointer}
+    .thumb h4{margin:6px 0;font-size:16px}
+    .thumb .mini{height:160px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:#0d1024}
+
+    /* Gallery slide */
+    .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+    .photo{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:1/1;border:1px solid rgba(255,255,255,.12);cursor:pointer}
+    .photo img{width:100%;height:100%;object-fit:cover;transition:transform .25s ease}
+    .photo:hover img{transform:scale(1.05)}
+    .photo .cap{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.45);color:#fff;padding:6px 8px;border-radius:10px;font-size:12px}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:2000}
+    .lightbox.active{display:flex}
+    .lightbox img{max-width:min(92vw, 900px);max-height:82vh;border-radius:18px}
+    .lightbox .close{position:absolute;top:18px;right:18px}
+    .lightbox .caption{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.35);padding:8px 12px;border-radius:12px}
+
+    /* GIF carousel */
+    .carousel{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+    .carousel-track{display:flex;transition:transform .5s ease}
+    .carousel-item{min-width:100%;height:320px;background:#0d0f1c;display:grid;place-items:center}
+    .carousel-item img{max-height:300px;object-fit:contain}
+
+    /* Confetti canvas */
+    canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:1500}
+
+    /* Typewriter caret */
+    .caret{display:inline-block;width:1ch;background:currentColor;animation:blink 1s steps(1) infinite;margin-left:3px}
+    @keyframes blink{50%{opacity:0}}
+
+    @media (max-width:640px){
+      .content{padding:20px}
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <header>
+    <div class="brand">
+      <img src="assets/rapunzel.jpg" alt="Avatar" />
+      <div>
+        <strong id="titleTop">Selamat Ulang Tahun, <span id="personTop"></span> 🎉</strong>
+        <div id="taglineTop" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+    <div class="controls" role="group" aria-label="Kontrol">
+      <button class="btn" id="prevBtn">◀</button>
+      <button class="btn" id="nextBtn">▶</button>
+      <button class="btn alt" id="overviewBtn">Overview ⤢</button>
+      <button class="btn secondary" id="themeBtn">.</button>
+      <button class="btn alt" id="musicBtn">Musik: Off 🔈</button>
+    </div>
+  </header>
+
+  <div class="deck" id="deck" aria-live="polite">
+    <!-- Slide 1: Hero -->
+    <section class="slide active" data-title="Pembuka">
+      <div class="content">
+        <h1>Selamat Ulang Tahun, <span id="personMain"></span> 🎂</h1>
+        <p id="taglineMain"></p>
+        <p>klik arah panah dibawah ituu </p>
+      </div>
+    </section>
+
+    <!-- Slide 2: Kenangan -->
+    <section class="slide" data-title="Kenangan manis">
+      <div class="content">
+        <h2>Aliya Nurul Setiawan</h2>
+        <p>She/Her.</p>
+        <div class="photos" id="photoGrid"></div>
+      </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto diperbesar">
+      <button class="btn alt close" id="lbClose">Tutup ✖</button>
+      <img id="lbImg" alt="Foto besar" />
+      <div class="caption" id="lbCap"></div>
+    </div>
+
+    <!-- Slide 3: GIF Anime -->
+    <section class="slide" data-title="GIF anime & fun">
+      <div class="content">
+        <h2>MLBB</h2>
+        <p>ours to keep.</p>
+        <div class="carousel" id="gifCarousel" aria-roledescription="carousel">
+          <div class="carousel-track" id="gifTrack"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Ucapan -->
+    <section class="slide" data-title="Ucapan untukmu">
+      <div class="content">
+        <h2>Ucapan untukmu</h2>
+        <p>Semoga tahun ini semakin pinter, semangat,dan semoga tahun ini kamu bisa immmortall :3.</p>
+        <p>Thank you for being such an amazing person!!!</p>
+      </div>
+    </section>
+
+    <!-- Slide 5: Rayakan -->
+    <section class="slide" data-title="Rayakan!">
+      <div class="content" style="text-align:center">
+        <h2>HAPPY BIRTHDAYY !!! 🥳</h2>
+        <p>Klik tombol dibawah.</p>
+        <button class="btn" id="celebrateBtn">Rayakan ✨</button>
+      </div>
+    </section>
+
+    <!-- Slide 6: Penutup -->
+    <section class="slide" data-title="Penutup">
+      <div class="content">
+        <h2>Aliya</h2>
+        <p>You deserve a happiness — hari ini dan setiap hari.</p>
+        <p>Semangat terus yaa !!!.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Overview -->
+  <div class="overview" id="overview">
+    <div class="controls" style="position:sticky;top:14px;z-index:1">
+      <button class="btn alt" id="closeOverview">Tutup Overview ✖</button>
+    </div>
+    <div class="grid" id="overviewGrid"></div>
+  </div>
+
+  <!-- Bottom dots + arrows -->
+  <div class="nav-bottom">
+    <div class="arrows">
+      <button class="btn" id="prevBtn2">◀</button>
+      <button class="btn" id="nextBtn2">▶</button>
+    </div>
+    <div id="dots" style="display:flex;gap:8px"></div>
+  </div>
+
+  <canvas id="confetti"></canvas>
+  <audio id="music" src="assets/batasenja.mp3" preload="auto"></audio>
+
+  <script>
+    // ===== CONFIG =====
+    const CONFIG = {
+      BIRTHDAY_PERSON: "Aliya",
+      TAGLINE: "Semoga panjang umur, bahagia, dan sehat selalu💫",
+      THEME_DEFAULT: "dark",
+      COLORS: ["#ff5ea1","#73f3ff","#ffd166","#66ff9c","#c084fc","#22d3ee","#fb7185"],
+      PHOTOS: [
+        {src:"assets/aliya1.jpg"},
+        {src:"assets/aliya2.jpg"},
+        {src:"assets/aliya3.jpg"},
+        {src:"assets/aliya4.jpg"},
+      ],
+      GIFS: [
+        {src:"assets/ml3.jpg", cap:"1"},
+        {src:"assets/ml2.jpg", cap:"2"},
+        {src:"assets/ml4.jpg", cap:"3"},
+      ]
+    };
+
+    // ===== Elements =====
+    const deck = document.getElementById('deck');
+    const slides = Array.from(deck.querySelectorAll('.slide'));
+    const bar = document.getElementById('bar');
+    const dots = document.getElementById('dots');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn2 = document.getElementById('prevBtn2');
+    const nextBtn2 = document.getElementById('nextBtn2');
+    const overviewBtn = document.getElementById('overviewBtn');
+    const overview = document.getElementById('overview');
+    const overviewGrid = document.getElementById('overviewGrid');
+    const closeOverview = document.getElementById('closeOverview');
+    const themeBtn = document.getElementById('themeBtn');
+    const musicBtn = document.getElementById('musicBtn');
+    const music = document.getElementById('music');
+    const personTop = document.getElementById('personTop');
+    const personMain = document.getElementById('personMain');
+    const taglineTop = document.getElementById('taglineTop');
+    const taglineMain = document.getElementById('taglineMain');
+    const photoGrid = document.getElementById('photoGrid');
+    const gifTrack = document.getElementById('gifTrack');
+    const celebrateBtn = document.getElementById('celebrateBtn');
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCap = document.getElementById('lbCap');
+    const lbClose = document.getElementById('lbClose');
+    const confettiCanvas = document.getElementById('confetti');
+    const ctx = confettiCanvas.getContext('2d');
+
+    // ===== Setup =====
+    let index = 0;
+    let musicOn = false;
+    document.body.setAttribute('data-theme', CONFIG.THEME_DEFAULT);
+    personTop.textContent = CONFIG.BIRTHDAY_PERSON;
+    personMain.textContent = CONFIG.BIRTHDAY_PERSON;
+
+    // Typewriter
+    const typewriter = (el, text, speed=34)=>{
+      let i=0; const caret=document.createElement('span'); caret.className='caret';
+      const tick=()=>{ el.textContent = text.slice(0, i++); if(i<=text.length){ requestAnimationFrame(()=>setTimeout(tick,speed)); } else { el.appendChild(caret); } };
+      tick();
+    };
+    typewriter(taglineTop, CONFIG.TAGLINE);
+    typewriter(taglineMain, CONFIG.TAGLINE);
+
+    // Resize canvas
+    const resize=()=>{ confettiCanvas.width=window.innerWidth; confettiCanvas.height=window.innerHeight; };
+    window.addEventListener('resize', resize); resize();
+
+    // Build dots
+    slides.forEach((_,i)=>{
+      const d=document.createElement('div'); d.className='dot'; if(i===0) d.classList.add('active');
+      d.addEventListener('click',()=>goTo(i));
+      dots.appendChild(d);
+    });
+
+    // Build overview
+    slides.forEach((s,i)=>{
+      const t=document.createElement('div'); t.className='thumb';
+      const mini=document.createElement('div'); mini.className='mini';
+      const h=document.createElement('h4'); h.textContent = `${i+1}. ${s.dataset.title||'Slide'}`;
+      mini.textContent = s.querySelector('h1,h2')?.textContent || 'Slide';
+      t.appendChild(mini); t.appendChild(h);
+      t.addEventListener('click',()=>{ goTo(i); toggleOverview(false); });
+      overviewGrid.appendChild(t);
+    });
+
+    // Photos
+    const photos = CONFIG.PHOTOS.filter(p=>p.src);
+    photos.forEach((p, idx)=>{
+      const d=document.createElement('div'); d.className='photo';
+      const img=document.createElement('img'); img.src=p.src; img.alt=p.cap||('Foto '+(idx+1));
+      const cap=document.createElement('div'); cap.className='cap'; cap.textContent=p.cap||'';
+      d.appendChild(img); d.appendChild(cap);
+      d.addEventListener('click', ()=>openLightbox(idx));
+      photoGrid.appendChild(d);
+    });
+
+    // Lightbox
+    let currentPhoto = 0;
+    const openLightbox=(idx)=>{ currentPhoto=idx; lbImg.src=photos[idx].src; lbCap.textContent=photos[idx].cap||''; lightbox.classList.add('active'); };
+    const closeLb=()=> lightbox.classList.remove('active');
+    lbClose.addEventListener('click', closeLb);
+    lightbox.addEventListener('click', (e)=>{ if(e.target===lightbox) closeLb(); });
+
+    // GIF carousel
+    const gifs = CONFIG.GIFS.filter(g=>g.src);
+    gifs.forEach(g=>{
+      const item=document.createElement('div'); item.className='carousel-item';
+      const img=document.createElement('img'); img.src=g.src; img.alt=g.cap||'GIF';
+      item.appendChild(img); gifTrack.appendChild(item);
+    });
+    let gifIndex=0; setInterval(()=>{ if(gifs.length){ gifTrack.style.transform=`translateX(-${gifIndex*100}%)`; gifIndex=(gifIndex+1)%gifs.length; } }, 2800);
+
+    // Confetti
+    const pieces=[];
+    const spawnConfetti=(x=innerWidth/2,y=innerHeight*0.4,count=220)=>{
+      for(let i=0;i<count;i++){
+        pieces.push({x,y,vx:(Math.random()*2-1)*6,vy:(Math.random()*-4-2),g:.18+Math.random()*.22,r:3+Math.random()*6,color:CONFIG.COLORS[Math.floor(Math.random()*CONFIG.COLORS.length)],shape:Math.random()<.5?'rect':'circle',life:120+Math.random()*80,rot:Math.random()*Math.PI*2,vr:(Math.random()*2-1)*.08});
+      }
+    };
+    const draw=()=>{
+      ctx.clearRect(0,0,innerWidth,innerHeight);
+      for(let i=pieces.length-1;i>=0;i--){
+        const p=pieces[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life--;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.color;
+        if(p.shape==='rect'){ ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); } else { ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill(); }
+        ctx.restore();
+        if(p.life<=0 || p.y>innerHeight+50) pieces.splice(i,1);
+      }
+      requestAnimationFrame(draw);
+    }; draw();
+
+    // Celebrate
+    if(celebrateBtn){
+      celebrateBtn.addEventListener('click',()=>{ spawnConfetti(innerWidth/2, innerHeight*0.4, 320); tryPlayMusic(); });
+    }
+
+    // Music
+    const tryPlayMusic= async ()=>{
+      try{ await music.play(); musicOn=true; musicBtn.textContent='Musik: On 🔊'; }catch(e){ /* autoplay blocked */ }
+    };
+    musicBtn.addEventListener('click', async ()=>{
+      try{
+        if(!musicOn){ await music.play(); musicOn=true; musicBtn.textContent='Musik: On 🔊'; }
+        else{ music.pause(); musicOn=false; musicBtn.textContent='Musik: Off 🔈'; }
+      }catch(e){}
+    });
+
+    // Theme
+    themeBtn.addEventListener('click', ()=>{
+      const now = document.body.getAttribute('data-theme');
+      const next = now==='dark'?'light':'dark';
+      document.body.setAttribute('data-theme', next);
+    });
+
+    // ===== Navigation =====
+    const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+    const goTo = (i)=>{
+      index = clamp(i, 0, slides.length-1);
+      deck.style.transform = `translateX(-${index*100}vw)`;
+      slides.forEach((s,j)=> s.classList.toggle('active', j===index));
+      Array.from(dots.children).forEach((d,j)=> d.classList.toggle('active', j===index));
+      bar.style.width = `${((index+1)/slides.length)*100}%`;
+      history.replaceState(null, '', `#slide-${index+1}`);
+    };
+    const next=()=>goTo(index+1);
+    const prev=()=>goTo(index-1);
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    prevBtn2.addEventListener('click', prev);
+    nextBtn2.addEventListener('click', next);
+
+    // Keyboard
+    document.addEventListener('keydown', (e)=>{
+      if(overview.classList.contains('active')){ if(e.key==='Escape') toggleOverview(false); return; }
+      if(e.key==='ArrowRight') next();
+      if(e.key==='ArrowLeft') prev();
+      if(e.key==='Home') goTo(0);
+      if(e.key==='End') goTo(slides.length-1);
+      if(e.key.toLowerCase()==='o') toggleOverview(true);
+    });
+
+    // Touch swipe
+    let startX=null;
+    deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
+    deck.addEventListener('touchmove', (e)=>{}, {passive:true});
+    deck.addEventListener('touchend', (e)=>{
+      if(startX===null) return;
+      const dx = (e.changedTouches[0].clientX - startX);
+      if(Math.abs(dx)>40){ if(dx<0) next(); else prev(); }
+      startX=null;
+    });
+
+    // Overview
+    const toggleOverview=(state=null)=>{
+      const s = state!==null ? state : !overview.classList.contains('active');
+      overview.classList.toggle('active', s);
+    };
+    overviewBtn.addEventListener('click', ()=>toggleOverview(true));
+    closeOverview.addEventListener('click', ()=>toggleOverview(false));
+
+    // Init from hash
+    const hash = location.hash.match(/slide-(\d+)/);
+    if(hash){ goTo(clamp(parseInt(hash[1])-1,0,slides.length-1)); } else { goTo(0); }
+
+    // Welcome confetti
+    window.addEventListener('load', ()=>{ spawnConfetti(innerWidth/2, innerHeight*0.4, 160); });
+
+    // Floating hearts
+function spawnHearts(count=10) {
+  for(let i=0;i<count;i++){
+    const h=document.createElement('div');
+    h.className='heart';
+    h.textContent='💖';
+    h.style.left=Math.random()*100+'vw';
+    h.style.top='100vh';
+    h.style.animationDuration=(4+Math.random()*4)+'s';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+  }
+}
+setInterval(()=>spawnHearts(6), 2000);
+
+// Bunny emoji burst
+function bunnyBurst(){
+  const emojis=['🐰','💖','🎀','✨'];
+  for(let i=0;i<8;i++){
+    const e=document.createElement('div');
+    e.className='emoji';
+    e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.left=(Math.random()*100)+'vw';
+    e.style.top=(innerHeight-60)+'px';
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),1500);
+  }
+}
+
+  </script>
+</body>
+</html>
