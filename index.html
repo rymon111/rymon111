@@ -6,6 +6,30 @@
   <title>Happy Birthday Aliya</title>
   <meta name="description" content="Website ucapan ulang tahun interaktif gaya slide-to-slide dengan overview.">
   <style>
+
+    @media(max-width:480px){
+  header{
+    flex-direction:column;
+    gap:10px;
+  }
+  .controls{
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .slide{
+    padding:100px 14px 80px;
+  }
+  .content{
+    padding:18px;
+  }
+  .photos{
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  }
+  .carousel-item{
+    height:240px;
+  }
+}
+
     :root {
   --bg1: #ffe6f0; 
   --bg2: #fff0f7;
@@ -459,3 +483,4 @@ function bunnyBurst(){
   </script>
 </body>
 </html>
+
